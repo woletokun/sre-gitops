@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tempo-stack
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://grafana.github.io/helm-charts'
+    chart: tempo
+    targetRevision: 1.10.1
+    helm:
+      values: |
+        tempo:
+          extraEnv:
+            - name: STORAGE_LOCAL_PATH
+              value: /var/tempo/traces
+          storage:
+            trace:
+              backend: local
+              local:
+                path: /var/tempo/traces
+              wal:
+                path: /var/tempo/wal
+          receivers:
+            otlp:
+              protocols:
+                grpc:
+                  endpoint: 0.0.0.0:4317
+                http:
+                  endpoint: 0.0.0.0:4318
+            zipkin:
+              endpoint: 0.0.0.0:9411
+            jaeger:
+              protocols:
+                thrift_compact:
+                  endpoint: 0.0.0.0:6831
+                thrift_binary:
+                  endpoint: 0.0.0.0:6832
+                thrift_http:
+                  endpoint: 0.0.0.0:14268
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
