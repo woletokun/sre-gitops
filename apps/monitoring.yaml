@@ -37,8 +37,7 @@ spec:
             paths: 
               - /grafana
             pathType: Prefix
-            hosts: 
-              - 172.18.20.115
+            hosts: []
         prometheus:
           prometheusSpec:
             retention: 7d
