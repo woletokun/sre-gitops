@@ -16,6 +16,11 @@ spec:
         prometheusOperator:
           crds:
             enabled: false
+          admissionWebhooks:
+            enabled: false
+            patch:
+              enabled: false
+
         grafana:
           enabled: true
           adminPassword: "admin" # Set initial lab password
