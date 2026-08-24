@@ -23,8 +23,7 @@ spec:
             enabled: true
             ingressClassName: nginx
 
-            paths:
-              - /grafana
+            paths: /grafana
             pathType: Prefix
         prometheus:
           prometheusSpec:
