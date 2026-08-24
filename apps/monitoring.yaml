@@ -22,7 +22,7 @@ spec:
           "grafana.ini":
             server:
               domain: "172.18.20.115"
-              root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+              root_url: "http://172.18.20.115/grafana/"
               serve_from_sub_path: true
 
           ingress:
@@ -50,3 +50,4 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true    # <-- Fixes CRD metadata annotation size limit
       - SkipDryRunOnMissingResource=true
+      - Replace=true
