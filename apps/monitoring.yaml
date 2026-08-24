@@ -19,8 +19,7 @@ spec:
           ingress:
             enabled: true
             ingressClassName: nginx
-            hosts:
-              - 172.18.20.115
+
             paths:
               - /grafana
             pathType: Prefix
@@ -38,3 +37,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true    # <-- Fixes CRD metadata annotation size limit
