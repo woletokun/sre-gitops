@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/YOUR_USERNAME/homelab-gitops.git' # Replace with your Git URL
+    repoURL: 'https://github.com/woletokun/sre-gitops.git' # Replace with your Git URL
     targetRevision: HEAD
     path: apps
   destination:
@@ -18,3 +18,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true    # Enables large CRDs for all child apps
