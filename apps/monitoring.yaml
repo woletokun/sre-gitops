@@ -13,6 +13,9 @@ spec:
     targetRevision: 58.2.0  # Stable chart version
     helm:
       values: |
+        prometheusOperator:
+          crds:
+            enabled: false
         grafana:
           enabled: true
           adminPassword: "admin" # Set initial lab password
