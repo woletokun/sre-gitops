@@ -34,7 +34,7 @@ spec:
           args:
             - |
               pip install kopf kubernetes psycopg2-binary
-              cat << 'EOF' > /tmp/operator.py
+              cat << 'pyEOF' > /tmp/operator.py
               import kopf, kubernetes, os, psycopg2
               from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
@@ -46,7 +46,7 @@ spec:
               def create_db(spec, name, namespace, patch, **kwargs):
                   db_name = spec.get('dbName', name)
                   
-                  # 1. Connect to PostgreSQL backend with auto-retry on connection failure
+                  # 1. Connect to PostgreSQL backend
                   try:
                       conn = psycopg2.connect(host=PG_HOST, user=PG_USER, password=PG_PASS, dbname="postgres", connect_timeout=5)
                       conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
@@ -55,9 +55,8 @@ spec:
                       cursor.close()
                       conn.close()
                   except psycopg2.errors.DuplicateDatabase:
-                      pass  # Database already exists
+                      pass
                   except Exception as e:
-                      # Retry in 10 seconds if DB connection fails
                       raise kopf.TemporaryError(f"Database connection failed: {e}", delay=10)
 
                   # 2. Create target Secret in requested namespace
@@ -80,7 +79,7 @@ spec:
                   try:
                       api.create_namespaced_secret(namespace=namespace, body=sec)
                   except kubernetes.client.exceptions.ApiException as e:
-                      if e.status != 409: # Ignore if secret already exists
+                      if e.status != 409:
                           raise e
                   
                   # 3. Update status subresource
@@ -89,5 +88,5 @@ spec:
                   patch.status['message'] = f"Database '{db_name}' provisioned successfully."
                   
                   return {'status': 'Ready'}
-              EOF
+              pyEOF
               kopf run --all-namespaces /tmp/operator.py
