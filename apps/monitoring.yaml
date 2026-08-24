@@ -19,6 +19,12 @@ spec:
         grafana:
           enabled: true
           adminPassword: "admin" # Set initial lab password
+          "grafana.ini":
+            server:
+              domain: "172.18.20.115"
+              root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+              serve_from_sub_path: true
+
           ingress:
             enabled: true
             ingressClassName: nginx
