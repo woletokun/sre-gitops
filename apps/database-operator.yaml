@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: platform-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: database-operator-sa
+  namespace: platform-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: database-operator-role
+rules:
+  - apiGroups: ["platform.example.com"]
+    resources: ["databaseclaims", "databaseclaims/status"]
+    verbs: ["*"]
+  - apiGroups: [""]
+    resources: ["secrets", "events"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: database-operator-binding
+subjects:
+  - kind: ServiceAccount
+    name: database-operator-sa
+    namespace: platform-system
+roleRef:
+  kind: ClusterRole
+  name: database-operator-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-operator
+  namespace: platform-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database-operator
+  template:
+    metadata:
+      labels:
+        app: database-operator
+    spec:
+      serviceAccountName: database-operator-sa
+      containers:
+        - name: operator
+          image: python:3.11-slim
+          command: ["sh", "-c"]
+          args:
+            - |
+              pip install kopf kubernetes
+              cat << 'EOF' > /app/operator.py
+              import kopf, kubernetes
+              @kopf.on.create('platform.example.com', 'v1alpha1', 'databaseclaims')
+              def create_db(spec, name, namespace, **kwargs):
+                  kubernetes.config.load_incluster_config()
+                  api = kubernetes.client.CoreV1Api()
+                  sec = {"apiVersion": "v1", "kind": "Secret", "metadata": {"name": f"{name}-db-creds", "namespace": namespace}, "stringData": {"DB": spec.get('dbName', 'default')}}
+                  kopf.adopt(sec)
+                  api.create_namespaced_secret(namespace=namespace, body=sec)
+                  return {'status': 'Ready'}
+              EOF
+              kopf run --all-namespaces /app/operator.py
