@@ -8,4 +8,5 @@ resources:
   - templates/serviceaccount.yaml
   - templates/clusterrole.yaml
   - templates/clusterrolebinding.yaml
+  - templates/postgres-backend.yaml
   - templates/deployment.yaml
