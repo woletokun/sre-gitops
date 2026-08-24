@@ -38,3 +38,4 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true    # <-- Fixes CRD metadata annotation size limit
+      - SkipDryRunOnMissingResource=true
