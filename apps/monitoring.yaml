@@ -41,7 +41,12 @@ spec:
           prometheusSpec:
             retention: 7d
             storageSpec:
-              emptyDir: {}
+              volumeClaimTemplate:
+                spec:
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 10Gi
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
