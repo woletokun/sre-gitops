@@ -46,9 +46,9 @@ spec:
               def create_db(spec, name, namespace, patch, **kwargs):
                   db_name = spec.get('dbName', name)
                   
-                  # 1. Connect to PostgreSQL backend and execute CREATE DATABASE
+                  # 1. Connect to PostgreSQL backend with auto-retry on connection failure
                   try:
-                      conn = psycopg2.connect(host=PG_HOST, user=PG_USER, password=PG_PASS, dbname="postgres")
+                      conn = psycopg2.connect(host=PG_HOST, user=PG_USER, password=PG_PASS, dbname="postgres", connect_timeout=5)
                       conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
                       cursor = conn.cursor()
                       cursor.execute(f'CREATE DATABASE "{db_name}";')
@@ -56,6 +56,9 @@ spec:
                       conn.close()
                   except psycopg2.errors.DuplicateDatabase:
                       pass  # Database already exists
+                  except Exception as e:
+                      # Retry in 10 seconds if DB connection fails
+                      raise kopf.TemporaryError(f"Database connection failed: {e}", delay=10)
 
                   # 2. Create target Secret in requested namespace
                   kubernetes.config.load_incluster_config()
