@@ -22,7 +22,7 @@ spec:
           config:
             table_manager:
               retention_deletes_enabled: true
-              retention_period: 168h # 7 days retention
+              retention_period: 168h
 
         promtail:
           enabled: true
@@ -31,7 +31,7 @@ spec:
               - url: http://loki-stack.monitoring.svc.cluster.local:3100/loki/api/v1/push
 
         grafana:
-          enabled: false # Using the existing Grafana from kube-prometheus-stack
+          enabled: false
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring
@@ -39,8 +39,7 @@ spec:
     - group: apps
       kind: StatefulSet
       jsonPointers:
-        - /spec/volumeClaimTemplates/0/metadata/creationTimestamp
-
+        - /spec/volumeClaimTemplates
   syncPolicy:
     automated:
       prune: true
@@ -48,5 +47,5 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-      - Replace=true
+      - RespectIgnoreDifferences=true
       - SkipDryRunOnMissingResource=true
