@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://prometheus-community.github.io/helm-charts'
     chart: kube-prometheus-stack
-    targetRevision: 58.2.0  # Stable chart version
+    targetRevision: 58.2.0
     helm:
       values: |
         prometheusOperator:
@@ -23,7 +23,7 @@ spec:
 
         grafana:
           enabled: true
-          adminPassword: "admin" # Set initial lab password
+          adminPassword: "admin"
           "grafana.ini":
             server:
               domain: "172.18.20.115"
@@ -33,11 +33,10 @@ spec:
           ingress:
             enabled: true
             ingressClassName: nginx
-
-            paths: 
-              - /grafana
+            path: /grafana
             pathType: Prefix
-            hosts: []
+            hosts:
+              - ""
         prometheus:
           prometheusSpec:
             retention: 7d
@@ -52,6 +51,6 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true    # <-- Fixes CRD metadata annotation size limit
+      - ServerSideApply=true
       - SkipDryRunOnMissingResource=true
       - Replace=true
