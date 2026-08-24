@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: "2026-08-24T19:26:37Z"
+  labels:
+    app.kubernetes.io/instance: root-app
+  name: database-operator-role
+  resourceVersion: "43728"
+  uid: 6d7f10b4-1a6c-429e-8641-3a014d45b48f
+rules:
+- apiGroups:
+  - platform.example.com
+  resources:
+  - databaseclaims
+  - databaseclaims/status
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - events
+  verbs:
+  - '*'

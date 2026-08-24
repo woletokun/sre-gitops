@@ -4,6 +4,42 @@ metadata:
   name: platform-system
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-operator-code
+  namespace: platform-system
+data:
+  operator.py: |
+    import kopf
+    import kubernetes
+
+    @kopf.on.create('platform.example.com', 'v1alpha1', 'databaseclaims')
+    def create_db(spec, name, namespace, logger, **kwargs):
+        logger.info(f"Creating DB claim for {name}")
+        kubernetes.config.load_incluster_config()
+        api = kubernetes.client.CoreV1Api()
+        
+        db_name = spec.get('dbName', 'default')
+        sec = {
+            "apiVersion": "v1",
+            "kind": "Secret",
+            "metadata": {
+                "name": f"{name}-creds",
+                "namespace": namespace
+            },
+            "stringData": {
+                "DB_NAME": db_name,
+                "USER": f"user_{name}",
+                "PASSWORD": "GeneratedPassword123!"
+            }
+        }
+        
+        kopf.adopt(sec)
+        api.create_namespaced_secret(namespace=namespace, body=sec)
+        logger.info(f"Secret {name}-creds created successfully")
+        return {'status': 'Ready', 'secret': f"{name}-creds"}
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: database-operator-sa
@@ -56,16 +92,11 @@ spec:
           command: ["sh", "-c"]
           args:
             - |
-              pip install kopf kubernetes
-              cat << 'EOF' > /app/operator.py
-              import kopf, kubernetes
-              @kopf.on.create('platform.example.com', 'v1alpha1', 'databaseclaims')
-              def create_db(spec, name, namespace, **kwargs):
-                  kubernetes.config.load_incluster_config()
-                  api = kubernetes.client.CoreV1Api()
-                  sec = {"apiVersion": "v1", "kind": "Secret", "metadata": {"name": f"{name}-db-creds", "namespace": namespace}, "stringData": {"DB": spec.get('dbName', 'default')}}
-                  kopf.adopt(sec)
-                  api.create_namespaced_secret(namespace=namespace, body=sec)
-                  return {'status': 'Ready'}
-              EOF
-              kopf run --all-namespaces /app/operator.py
+              pip install --no-cache-dir kopf kubernetes && kopf run --all-namespaces /app/operator.py
+          volumeMounts:
+            - name: operator-code
+              mountPath: /app
+      volumes:
+        - name: operator-code
+          configMap:
+            name: database-operator-code
