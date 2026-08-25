@@ -22,8 +22,6 @@ spec:
         message: "Running as root is forbidden. Set 'securityContext.runAsNonRoot: true'."
         pattern:
           spec:
-            =(securityContext):
-              =(runAsNonRoot): true
             containers:
-              - =(securityContext):
-                  =(runAsNonRoot): true
+              - securityContext:
+                  runAsNonRoot: true
