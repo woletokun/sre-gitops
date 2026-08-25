@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/woletokun/sre-gitops.git'
     targetRevision: HEAD
-    path: apps/platform-system/database-operator
+    path: apps/platform-system/database-operator/templates
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: platform-system
@@ -21,3 +21,4 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - Force=true
