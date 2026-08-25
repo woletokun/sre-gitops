@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'git@github-woletokun:woletokun/sre-gitops.git'
+    repoURL: 'https://github.com/woletokun/sre-gitops.git'
     targetRevision: test/trivy-pipeline
     path: apps/demo-app
   destination:
