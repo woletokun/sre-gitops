@@ -6,7 +6,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Create non-root system group and user (Debian/Ubuntu syntax)
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+RUN groupadd --system appgroup && useradd --system --gid appgroup appuser
 
 COPY . .
 
