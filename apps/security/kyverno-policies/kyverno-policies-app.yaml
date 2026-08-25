@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://github.com/woletokun/sre-gitops.git'
     targetRevision: HEAD
-    path: apps/security/kyverno-policies/templates
+    path: apps/security/kyverno-policies
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kyverno
