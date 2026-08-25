@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-app
+---
+apiVersion: platform.example.com/v1alpha1
+kind: DatabaseClaim
+metadata:
+  name: webapp-db-claim
+  namespace: demo-app
+spec:
+  dbName: webapp_db
