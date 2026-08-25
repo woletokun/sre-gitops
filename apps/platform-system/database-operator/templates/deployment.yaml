@@ -24,6 +24,7 @@ spec:
       containers:
         - name: database-operator
           image: database-operator:latest
+          imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
