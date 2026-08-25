@@ -1,0 +1,7 @@
+apiVersion: platform.example.com/v1alpha1
+kind: DatabaseClaim
+metadata:
+  name: app-db-claim
+  namespace: platform-system
+spec:
+  dbName: app_production

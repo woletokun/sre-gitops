@@ -12,6 +12,14 @@ rules:
   - apiGroups: [""]
     resources: ["namespaces", "events"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Custom Resource permissions
+  - apiGroups: ["platform.example.com"]
+    resources: ["databaseclaims", "databaseclaims/status", "databaseclaims/finalizers"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Kopf peering permissions
+  - apiGroups: ["kopf.dev"]
+    resources: ["kopfpeering", "clusterkopfpeerings"]
+    verbs: ["get", "list", "watch", "create", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
