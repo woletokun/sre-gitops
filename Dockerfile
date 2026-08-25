@@ -9,4 +9,7 @@ COPY operator.py /app/operator.py
 # Create app group and user
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
+# Switch to non-root user
+USER appuser
+
 CMD ["kopf", "run", "--all-namespaces", "/app/operator.py"]
