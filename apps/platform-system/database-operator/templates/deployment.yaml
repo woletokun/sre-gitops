@@ -14,89 +14,32 @@ spec:
         app: database-operator
     spec:
       serviceAccountName: database-operator-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: database-operator
-
+          image: database-operator:latest
           securityContext:
+            allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
           volumeMounts:
             - name: tmp
               mountPath: /tmp
       volumes:
         - name: tmp
           emptyDir: {}
-
-          image: python:3.11-slim
-          env:
-            - name: PG_HOST
-              value: "postgres-backend.platform-system.svc.cluster.local"
-            - name: PG_USER
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-credentials
-                  key: POSTGRES_USER
-            - name: PG_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-credentials
-                  key: POSTGRES_PASSWORD
-          command: ["sh", "-c"]
-          args:
-            - |
-              pip install kopf kubernetes psycopg2-binary
-              cat << 'pyEOF' > /tmp/operator.py
-              import kopf, kubernetes, os, psycopg2
-              from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-
-              PG_HOST = os.getenv("PG_HOST", "postgres-backend.platform-system.svc.cluster.local")
-              PG_USER = os.getenv("PG_USER", "postgres")
-              PG_PASS = os.getenv("PG_PASSWORD", "AdminSuperSecretPassword123!")
-
-              @kopf.on.create('platform.example.com', 'v1alpha1', 'databaseclaims')
-              def create_db(spec, name, namespace, patch, **kwargs):
-                  db_name = spec.get('dbName', name)
-                  
-                  # 1. Connect to PostgreSQL backend
-                  try:
-                      conn = psycopg2.connect(host=PG_HOST, user=PG_USER, password=PG_PASS, dbname="postgres", connect_timeout=5)
-                      conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-                      cursor = conn.cursor()
-                      cursor.execute(f'CREATE DATABASE "{db_name}";')
-                      cursor.close()
-                      conn.close()
-                  except psycopg2.errors.DuplicateDatabase:
-                      pass
-                  except Exception as e:
-                      raise kopf.TemporaryError(f"Database connection failed: {e}", delay=10)
-
-                  # 2. Create target Secret in requested namespace
-                  kubernetes.config.load_incluster_config()
-                  api = kubernetes.client.CoreV1Api()
-                  sec = {
-                      "apiVersion": "v1",
-                      "kind": "Secret",
-                      "metadata": {"name": f"{name}-db-creds", "namespace": namespace},
-                      "stringData": {
-                          "DB_NAME": db_name,
-                          "DB_HOST": PG_HOST,
-                          "DB_PORT": "5432",
-                          "DB_USER": PG_USER,
-                          "DB_PASSWORD": PG_PASS
-                      }
-                  }
-                  kopf.adopt(sec)
-                  
-                  try:
-                      api.create_namespaced_secret(namespace=namespace, body=sec)
-                  except kubernetes.client.exceptions.ApiException as e:
-                      if e.status != 409:
-                          raise e
-                  
-                  # 3. Update status subresource
-                  patch.status['phase'] = 'Ready'
-                  patch.status['secretName'] = f"{name}-db-creds"
-                  patch.status['message'] = f"Database '{db_name}' provisioned successfully."
-                  
-                  return {'status': 'Ready'}
-              pyEOF
-              kopf run --all-namespaces /tmp/operator.py
