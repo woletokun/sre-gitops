@@ -8,33 +8,22 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/woletokun/sre-gitops.git'
-    targetRevision: test/trivy-pipeline
-    path: apps/platform-system/kyverno
+    repoURL: 'https://kyverno.github.io/kyverno/'
+    chart: kyverno
+    targetRevision: 3.0.0
     helm:
       values: |
-        kyverno:
-          cleanupJobs:
-            admissionReports:
-              image:
-                repository: registry.k8s.io/kubectl
-                tag: v1.28.5
-            clusterAdmissionReports:
-              image:
-                repository: registry.k8s.io/kubectl
-                tag: v1.28.5
-            clusterEphemeralReports:
-              image:
-                repository: registry.k8s.io/kubectl
-                tag: v1.28.5
-            ephemeralReports:
-              image:
-                repository: registry.k8s.io/kubectl
-                tag: v1.28.5
-            updateRequests:
-              image:
-                repository: registry.k8s.io/kubectl
-                tag: v1.28.5
+        cleanupJobs:
+          admissionReports:
+            enabled: false
+          clusterAdmissionReports:
+            enabled: false
+          clusterEphemeralReports:
+            enabled: false
+          ephemeralReports:
+            enabled: false
+          updateRequests:
+            enabled: false
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kyverno
