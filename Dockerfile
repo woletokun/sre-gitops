@@ -7,7 +7,6 @@ RUN pip install --no-cache-dir kopf kubernetes
 COPY operator.py /app/operator.py
 
 # Create app group and user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 CMD ["kopf", "run", "--all-namespaces", "/app/operator.py"]
