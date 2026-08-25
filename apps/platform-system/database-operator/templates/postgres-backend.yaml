@@ -42,6 +42,22 @@ spec:
     spec:
       containers:
         - name: postgres
+
+          securityContext:
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            - name: run-tmp
+              mountPath: /var/run/postgresql
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: run-tmp
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+
           image: postgres:16-alpine
           ports:
             - containerPort: 5432
