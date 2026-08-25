@@ -8,19 +8,33 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://kyverno.github.io/kyverno/'
-    chart: kyverno
-    targetRevision: 3.2.5
+    repoURL: 'https://github.com/woletokun/sre-gitops.git'
+    targetRevision: test/trivy-pipeline
+    path: apps/platform-system/kyverno
     helm:
       values: |
-        admissionController:
-          replicas: 1
-        backgroundController:
-          replicas: 1
-        cleanupController:
-          replicas: 1
-        reportsController:
-          replicas: 1
+        kyverno:
+          cleanupJobs:
+            admissionReports:
+              image:
+                repository: registry.k8s.io/kubectl
+                tag: v1.28.5
+            clusterAdmissionReports:
+              image:
+                repository: registry.k8s.io/kubectl
+                tag: v1.28.5
+            clusterEphemeralReports:
+              image:
+                repository: registry.k8s.io/kubectl
+                tag: v1.28.5
+            ephemeralReports:
+              image:
+                repository: registry.k8s.io/kubectl
+                tag: v1.28.5
+            updateRequests:
+              image:
+                repository: registry.k8s.io/kubectl
+                tag: v1.28.5
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: kyverno
@@ -30,4 +44,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
