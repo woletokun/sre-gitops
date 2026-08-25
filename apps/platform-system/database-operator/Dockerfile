@@ -3,7 +3,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Upgrade base tooling to clear vendored setuptools/wheel CVEs
-RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir --upgrade pip "setuptools>=75.0.0" "wheel>=0.46.2"
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
