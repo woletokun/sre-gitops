@@ -8,8 +8,8 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/kubenaut/sre-gitops.git' # Replace with your exact git remote URL if different
-    targetRevision: HEAD
+    repoURL: 'git@github-woletokun:woletokun/sre-gitops.git'
+    targetRevision: test/trivy-pipeline
     path: apps/demo-app
   destination:
     server: 'https://kubernetes.default.svc'
