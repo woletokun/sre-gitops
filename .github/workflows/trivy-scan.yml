@@ -35,7 +35,7 @@ jobs:
 
       - name: Build Local Operator Image
         run: |
-          docker build -t database-operator:local apps/platform-system/database-operator/
+          docker build -t database-operator:local -f Dockerfile .
 
       - name: Run Trivy Vulnerability Scanner on Image
         uses: aquasecurity/trivy-action@master

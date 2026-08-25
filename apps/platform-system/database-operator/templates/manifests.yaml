@@ -7,27 +7,45 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: database-operator-role
+  name: database-operator-cluster-role
 rules:
-  - apiGroups: ["platform.example.com"]
-    resources: ["databaseclaims", "databaseclaims/status"]
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   - apiGroups: [""]
-    resources: ["secrets", "namespaces", "events"]
+    resources: ["namespaces", "events"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-  - apiGroups: ["apiextensions.k8s.io"]
-    resources: ["customresourcedefinitions"]
-    verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: database-operator-binding
+  name: database-operator-cluster-rolebinding
 subjects:
   - kind: ServiceAccount
     name: database-operator-sa
     namespace: platform-system
 roleRef:
   kind: ClusterRole
+  name: database-operator-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: database-operator-role
+  namespace: platform-system
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: database-operator-rolebinding
+  namespace: platform-system
+subjects:
+  - kind: ServiceAccount
+    name: database-operator-sa
+    namespace: platform-system
+roleRef:
+  kind: Role
   name: database-operator-role
   apiGroup: rbac.authorization.k8s.io

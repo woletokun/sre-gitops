@@ -16,6 +16,16 @@ spec:
       serviceAccountName: database-operator-sa
       containers:
         - name: database-operator
+
+          securityContext:
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+
           image: python:3.11-slim
           env:
             - name: PG_HOST
