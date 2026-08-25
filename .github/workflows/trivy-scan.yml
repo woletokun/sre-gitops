@@ -1,0 +1,47 @@
+name: Security & Vulnerability Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at midnight to check for newly published CVEs
+    - cron: '0 0 * * *'
+
+jobs:
+  iac-manifest-scan:
+    name: Scan Kubernetes Manifests (IaC)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy IaC / Manifest Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          hide-progress: false
+          format: 'table'
+          exit-code: '1' # Fails the PR build if critical misconfigurations are found
+          severity: 'CRITICAL,HIGH'
+
+  container-image-scan:
+    name: Scan Database Operator Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Local Operator Image
+        run: |
+          docker build -t database-operator:local apps/platform-system/database-operator/
+
+      - name: Run Trivy Vulnerability Scanner on Image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'database-operator:local'
+          format: 'table'
+          exit-code: '1' # Fails pipeline if unfixed CRITICAL/HIGH vulnerabilities exist
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
