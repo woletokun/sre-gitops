@@ -21,4 +21,10 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-      - Force=true
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      name: postgres-backend
+      jsonPointers:
+        - /spec/volumeClaimTemplates/0/status
+        - /spec/volumeClaimTemplates/0/metadata/creationTimestamp
