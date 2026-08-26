@@ -20,10 +20,7 @@ spec:
           serviceType: "ClusterIP"
           image:
             tag: "lts-jdk17"
-          installPlugins:
-            - "kubernetes"
-            - "git"
-            - "configuration-as-code"
+          installPlugins: []
           ingress:
             enabled: true
             ingressClassName: nginx
