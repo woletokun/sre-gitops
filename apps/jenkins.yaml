@@ -20,31 +20,24 @@ spec:
           javaOpts: "-Xmx1536m"
           healthEndPoints:
             - "/jenkins/login"
-          healthCustomHeaders: []
+          startupProbe:
+            httpGet:
+              path: "/jenkins/login"
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: "/jenkins/login"
               port: 8080
             initialDelaySeconds: 60
             periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 12
           readinessProbe:
             httpGet:
               path: "/jenkins/login"
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 10
-          startupProbe:
-            httpGet:
-              path: "/jenkins/login"
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 30
           serviceType: "ClusterIP"
           image:
             tag: "lts-jdk17"
