@@ -1,0 +1,39 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+data:
+  datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+      - name: Loki
+        type: loki
+        url: http://loki-stack:3100
+        access: proxy
+        isDefault: false
+  loki-stack-datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: Loki
+      type: loki
+      access: proxy
+      url: "http://loki-stack:3100"
+      version: 1
+      isDefault: false
+      jsonData:
+        {}
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2026-08-24T15:37:04Z"
+  labels:
+    app: loki-stack
+    app.kubernetes.io/instance: loki-stack
+    chart: loki-stack-2.10.2
+    grafana_datasource: "1"
+    heritage: Helm
+    release: loki-stack
+  name: loki-stack
+  namespace: monitoring
+  resourceVersion: "499569"
+  uid: 9b026786-cfec-4d83-aa04-70e91da25d90
