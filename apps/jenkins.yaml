@@ -17,6 +17,7 @@ spec:
           componentName: "jenkins-controller"
           jenkinsOpts: "--prefix=/jenkins"
           jenkinsUrl: "http://172.18.20.115/jenkins/"
+          javaOpts: "-Xmx1536m"
           serviceType: "ClusterIP"
           image:
             tag: "lts-jdk17"
@@ -28,11 +29,11 @@ spec:
               - "/jenkins"
           resources:
             requests:
-              cpu: "250m"
-              memory: "512Mi"
-            limits:
-              cpu: "1000m"
+              cpu: "500m"
               memory: "1024Mi"
+            limits:
+              cpu: "2000m"
+              memory: "2048Mi"
         persistence:
           enabled: true
           storageClass: "local-path"
