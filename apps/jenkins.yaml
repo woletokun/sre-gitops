@@ -45,9 +45,13 @@ spec:
             tag: "lts-jdk17"
           installPlugins:
             - "configuration-as-code"
+            - "kubernetes"
           ingress:
             enabled: true
+            apiVersion: "networking.k8s.io/v1"
             ingressClassName: nginx
+            serviceName: jenkins
+            servicePort: 8080
             paths:
               - path: /jenkins
                 pathType: Prefix
