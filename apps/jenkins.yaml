@@ -18,12 +18,11 @@ spec:
           jenkinsOpts: "--prefix=/jenkins"
           jenkinsUrl: "http://172.18.20.115/jenkins/"
           javaOpts: "-Xmx1536m"
+          probePath: "/jenkins/login"
           serviceType: "ClusterIP"
           image:
             tag: "lts-jdk17"
           installPlugins: []
-          healthEndPoints:
-            - "/jenkins/login"
           startupProbe:
             httpGet:
               path: "/jenkins/login"
