@@ -22,14 +22,24 @@ spec:
           image:
             tag: "lts-jdk17"
           installPlugins: []
-          startupProbe:
-            initialDelaySeconds: 120
-            periodSeconds: 10
-            failureThreshold: 30
+          healthProbes: true
+          healthProbesCustomPath: "/jenkins/login"
           livenessProbe:
+            httpGet:
+              path: "/jenkins/login"
+              port: 8080
             initialDelaySeconds: 120
             periodSeconds: 10
-            failureThreshold: 10
+            timeoutSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            httpGet:
+              path: "/jenkins/login"
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12
           ingress:
             enabled: true
             ingressClassName: nginx
