@@ -17,22 +17,27 @@ spec:
           jenkinsUriPrefix: "/jenkins"
           jenkinsOpts: "--prefix=/jenkins"
           jenkinsUrl: "http://172.18.20.115/jenkins/"
-          healthProbes: false
-          customStartupProbe:
+          healthProbes: true
+          healthEndPoints:
+            - "/jenkins/login"
+          startupProbe:
+            enabled: true
             httpGet:
               path: "/jenkins/login"
               port: 8080
             failureThreshold: 30
             periodSeconds: 10
             timeoutSeconds: 5
-          customLivenessProbe:
+          livenessProbe:
+            enabled: true
             httpGet:
               path: "/jenkins/login"
               port: 8080
             failureThreshold: 5
             periodSeconds: 10
             timeoutSeconds: 5
-          customReadinessProbe:
+          readinessProbe:
+            enabled: true
             httpGet:
               path: "/jenkins/login"
               port: 8080
