@@ -14,6 +14,8 @@ spec:
     helm:
       values: |
         controller:
+          image:
+            tag: "2.504.3-lts-jdk17"
           componentName: "jenkins-controller"
           serviceType: ClusterIP
   destination:
