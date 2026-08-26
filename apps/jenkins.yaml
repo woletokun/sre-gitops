@@ -15,11 +15,18 @@ spec:
       values: |
         controller:
           componentName: "jenkins-controller"
+          jenkinsOpts: "--prefix=/jenkins"
           serviceType: "ClusterIP"
           installPlugins:
             - "kubernetes:4293.v75f91757d54e"
             - "git:5.2.1"
             - "configuration-as-code:1775.v810d70a_7391e"
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            paths:
+              - /jenkins
+            hostName: ""
           resources:
             requests:
               cpu: "250m"
