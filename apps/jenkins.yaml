@@ -18,11 +18,21 @@ spec:
           jenkinsOpts: "--prefix=/jenkins"
           jenkinsUrl: "http://172.18.20.115/jenkins/"
           healthProbes: true
-          healthProbeLivenessPath: "/jenkins/login"
-          healthProbeReadinessPath: "/jenkins/login"
-          healthProbeStartupPath: "/jenkins/login"
-          healthEndPoints:
-            - "/jenkins/login"
+          startupProbe:
+            enabled: true
+            probePath: "/jenkins/login"
+            failureThreshold: 30
+            periodSeconds: 10
+          livenessProbe:
+            enabled: true
+            probePath: "/jenkins/login"
+            failureThreshold: 5
+            periodSeconds: 10
+          readinessProbe:
+            enabled: true
+            probePath: "/jenkins/login"
+            failureThreshold: 5
+            periodSeconds: 10
           serviceType: "ClusterIP"
           image:
             tag: "lts-jdk17"
