@@ -14,6 +14,7 @@ spec:
     helm:
       values: |
         controller:
+          jenkinsUriPrefix: "/jenkins"
           jenkinsOpts: "--prefix=/jenkins"
           jenkinsUrl: "http://172.18.20.115/jenkins/"
           probePath: "/jenkins/login"
