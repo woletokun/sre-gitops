@@ -15,8 +15,6 @@ spec:
       values: |
         controller:
           componentName: "jenkins-controller"
-          jenkinsOpts: "--prefix=/jenkins"
-          jenkinsUrl: "http://172.18.20.115/jenkins/"
           serviceType: "ClusterIP"
           image:
             tag: "lts-jdk17"
@@ -25,8 +23,11 @@ spec:
           ingress:
             enabled: true
             ingressClassName: nginx
+            annotations:
+              nginx.ingress.kubernetes.io/rewrite-target: /$2
+              nginx.ingress.kubernetes.io/ssl-redirect: "false"
             paths:
-              - "/jenkins"
+              - "/jenkins(/|$)(.*)"
           resources:
             requests:
               cpu: "500m"
@@ -47,4 +48,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-
