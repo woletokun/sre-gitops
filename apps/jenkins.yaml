@@ -17,6 +17,8 @@ spec:
           jenkinsUriPrefix: "/jenkins"
           jenkinsOpts: "--prefix=/jenkins"
           jenkinsUrl: "http://172.18.20.115/jenkins/"
+          adminUser: "admin"
+          adminPassword: "AdminPassword123!"
           healthProbes: true
           healthProbesTimeout: 10
           startupProbe:
