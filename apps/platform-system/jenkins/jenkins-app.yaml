@@ -10,29 +10,16 @@ spec:
   source:
     repoURL: 'https://charts.jenkins.io'
     chart: jenkins
-    targetRevision: 5.1.4
+    targetRevision: 5.8.13
     helm:
       values: |
         controller:
           componentName: "jenkins-controller"
-          runAsUser: 1000
-          runAsGroup: 1000
-          fsGroup: 1000
-          resources:
-            requests:
-              cpu: "250m"
-              memory: "512Mi"
-            limits:
-              cpu: "1000m"
-              memory: "2Gi"
           serviceType: ClusterIP
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: jenkins
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
