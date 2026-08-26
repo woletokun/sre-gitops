@@ -27,6 +27,13 @@ spec:
             limits:
               cpu: "1000m"
               memory: "1024Mi"
+           ingress:
+            enabled: true
+            ingressClassName: nginx
+            path: /jenkins
+            hosts:
+              - ""
+
         persistence:
           enabled: true
           storageClass: "local-path"
