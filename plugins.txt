@@ -1,0 +1,4 @@
+kubernetes
+git
+credentials
+configuration-as-code
