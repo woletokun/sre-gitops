@@ -15,40 +15,18 @@ spec:
       values: |
         controller:
           componentName: "jenkins-controller"
-          jenkinsOpts: "--prefix=/jenkins"
-          jenkinsUrl: "http://172.18.20.115/jenkins/"
-          javaOpts: "-Xmx1536m"
-          probePath: "/jenkins/login"
           serviceType: "ClusterIP"
           image:
             tag: "lts-jdk17"
           installPlugins: []
-          startupProbe:
-            httpGet:
-              path: "/jenkins/login"
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            failureThreshold: 30
-          livenessProbe:
-            httpGet:
-              path: "/jenkins/login"
-              port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 10
-            failureThreshold: 10
-          readinessProbe:
-            httpGet:
-              path: "/jenkins/login"
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            failureThreshold: 10
           ingress:
             enabled: true
             ingressClassName: nginx
+            annotations:
+              nginx.ingress.kubernetes.io/rewrite-target: /$2
+              nginx.ingress.kubernetes.io/ssl-redirect: "false"
             paths:
-              - "/jenkins"
+              - "/jenkins(/|$)(.*)"
           resources:
             requests:
               cpu: "500m"
