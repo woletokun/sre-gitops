@@ -16,6 +16,7 @@ spec:
         controller:
           componentName: "jenkins-controller"
           jenkinsOpts: "--prefix=/jenkins"
+          jenkinsUrl: "http://172.18.20.115/jenkins/"
           serviceType: "ClusterIP"
           installPlugins:
             - "kubernetes:4293.v75f91757d54e"
@@ -24,9 +25,10 @@ spec:
           ingress:
             enabled: true
             ingressClassName: nginx
+            apiVersion: "networking.k8s.io/v1"
             paths:
-              - /jenkins
-            hostName: ""
+              - path: /jenkins
+                pathType: Prefix
           resources:
             requests:
               cpu: "250m"
