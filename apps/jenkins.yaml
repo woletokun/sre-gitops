@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: 'https://charts.jenkins.io'
     chart: jenkins
-    targetRevision: 5.8.24
+    targetRevision: 5.8.15
     helm:
       values: |
         controller:
@@ -22,24 +22,29 @@ spec:
           image:
             tag: "lts-jdk17"
           installPlugins: []
-          healthProbes: true
-          healthProbesCustomPath: "/jenkins/login"
-          livenessProbe:
+          healthEndPoints:
+            - "/jenkins/login"
+          startupProbe:
             httpGet:
               path: "/jenkins/login"
               port: 8080
-            initialDelaySeconds: 120
+            initialDelaySeconds: 30
             periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 12
-          readinessProbe:
+            failureThreshold: 30
+          livenessProbe:
             httpGet:
               path: "/jenkins/login"
               port: 8080
             initialDelaySeconds: 60
             periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 12
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              path: "/jenkins/login"
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 10
           ingress:
             enabled: true
             ingressClassName: nginx
