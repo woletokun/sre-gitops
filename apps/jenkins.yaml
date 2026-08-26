@@ -29,13 +29,13 @@ spec:
             httpGet:
               path: "/jenkins/login"
               port: 8080
-            initialDelaySeconds: 60
+            failureThreshold: 5
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: "/jenkins/login"
               port: 8080
-            initialDelaySeconds: 30
+            failureThreshold: 3
             periodSeconds: 10
           serviceType: "ClusterIP"
           image:
@@ -45,10 +45,8 @@ spec:
           ingress:
             enabled: true
             ingressClassName: nginx
-            annotations:
-              nginx.ingress.kubernetes.io/ssl-redirect: "false"
             paths:
-              - path: "/jenkins"
+              - path: /jenkins
                 pathType: Prefix
           resources:
             requests:
