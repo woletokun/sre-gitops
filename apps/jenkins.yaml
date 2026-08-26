@@ -14,7 +14,6 @@ spec:
     helm:
       values: |
         controller:
-          componentName: "jenkins-controller"
           jenkinsOpts: "--prefix=/jenkins"
           jenkinsUrl: "http://172.18.20.115/jenkins/"
           javaOpts: "-Xmx1536m"
