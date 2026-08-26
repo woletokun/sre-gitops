@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jenkins
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.jenkins.io'
+    chart: jenkins
+    targetRevision: 5.8.12
+    helm:
+      values: |
+        controller:
+          componentName: "jenkins-controller"
+          serviceType: "ClusterIP"
+          installPlugins:
+            - "kubernetes:4293.v75f91757d54e"
+            - "git:5.2.1"
+            - "configuration-as-code:1775.v810d70a_7391e"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"
+        persistence:
+          enabled: true
+          storageClass: "local-path"
+          size: "10Gi"
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: jenkins
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
