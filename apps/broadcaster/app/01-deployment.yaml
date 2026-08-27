@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broadcaster-app
+  namespace: broadcaster-dev
+  labels:
+    app: broadcaster-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: broadcaster-app
+  template:
+    metadata:
+      labels:
+        app: broadcaster-app
+    spec:
+      containers:
+        - name: broadcaster-app
+          image: broadcaster-server:v1.3.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: tcp-broadcast
+            - containerPort: 8081
+              name: http-ws
+          env:
+            - name: DB_HOST
+              value: "postgres-service"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
