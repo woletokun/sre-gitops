@@ -1,0 +1,76 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME         = 'broadcaster-server'
+        IMAGE_TAG        = "v1.3.${BUILD_NUMBER}"
+        K3D_CLUSTER_NAME = 'sreLab'
+        NAMESPACE        = 'broadcaster-dev'
+        MANIFESTS_DIR    = 'apps/broadcaster'
+    }
+
+    options {
+        timeout(time: 15, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        stage('Checkout & Lint') {
+            steps {
+                echo "Building commit ${GIT_COMMIT}"
+                dir('broadcaster-app') {
+                    sh 'go vet ./...'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('broadcaster-app') {
+                    echo "Building ${APP_NAME}:${IMAGE_TAG}..."
+                    sh "docker build -t ${APP_NAME}:${IMAGE_TAG} ."
+                    sh "docker tag ${APP_NAME}:${IMAGE_TAG} ${APP_NAME}:latest"
+                }
+            }
+        }
+
+        stage('Import to k3d Cluster') {
+            steps {
+                echo "Importing image into k3d cluster (${K3D_CLUSTER_NAME})..."
+                sh "k3d image import ${APP_NAME}:${IMAGE_TAG} -c ${K3D_CLUSTER_NAME}"
+            }
+        }
+
+        stage('Update Manifests & Deploy') {
+            steps {
+                echo "Updating deployment image tag to ${IMAGE_TAG}..."
+                sh """
+                    sed -i 's|image: ${APP_NAME}:.*|image: ${APP_NAME}:${IMAGE_TAG}|g' ${MANIFESTS_DIR}/app/01-deployment.yaml
+                    kubectl apply -f ${MANIFESTS_DIR}/db/
+                    kubectl apply -f ${MANIFESTS_DIR}/app/
+                """
+            }
+        }
+
+        stage('Verify Rollout Status') {
+            steps {
+                echo "Waiting for deployment rollout..."
+                sh """
+                    kubectl rollout status deployment/broadcaster-app -n ${NAMESPACE} --timeout=120s
+                    kubectl get pods -n ${NAMESPACE} -l app=broadcaster-app
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Successfully deployed ${APP_NAME}:${IMAGE_TAG} to ${NAMESPACE}!"
+        }
+        failure {
+            echo "Pipeline failed! Checking pod logs..."
+            sh "kubectl logs -n ${NAMESPACE} -l app=broadcaster-app --tail=50 || true"
+        }
+    }
+}
