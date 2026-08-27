@@ -47,6 +47,8 @@ spec:
         NAMESPACE        = 'broadcaster-dev'
         MANIFESTS_DIR    = 'apps/broadcaster'
         PATH             = "/usr/local/go/bin:/host-bin:${env.PATH}"
+        GOCACHE          = "${WORKSPACE}/.cache/go-build"
+        GOPATH           = "${WORKSPACE}/.go"
     }
 
     options {
@@ -60,6 +62,7 @@ spec:
             steps {
                 echo "Building commit ${GIT_COMMIT}"
                 dir('broadcaster-app') {
+                    sh 'mkdir -p ${GOCACHE} ${GOPATH}'
                     sh 'go vet ./...'
                 }
             }
