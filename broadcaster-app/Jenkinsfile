@@ -13,6 +13,7 @@ spec:
     image: jenkins/inbound-agent:latest
     securityContext:
       privileged: true
+      runAsUser: 0
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: docker-sock
@@ -20,10 +21,8 @@ spec:
       name: docker-bin
     - mountPath: /usr/local/go
       name: go-home
-    - mountPath: /usr/bin/kubectl
-      name: kubectl-bin
-    - mountPath: /usr/local/bin/k3d
-      name: k3d-bin
+    - mountPath: /usr/local/bin
+      name: local-bin
   volumes:
   - name: docker-sock
     hostPath:
@@ -34,12 +33,9 @@ spec:
   - name: go-home
     hostPath:
       path: /usr/local/go
-  - name: kubectl-bin
+  - name: local-bin
     hostPath:
-      path: /usr/bin/kubectl
-  - name: k3d-bin
-    hostPath:
-      path: /usr/local/bin/k3d
+      path: /usr/local/bin
 '''
         }
     }
@@ -50,7 +46,7 @@ spec:
         K3D_CLUSTER_NAME = 'sreLab'
         NAMESPACE        = 'broadcaster-dev'
         MANIFESTS_DIR    = 'apps/broadcaster'
-        PATH             = "/usr/local/go/bin:${env.PATH}"
+        PATH             = "/usr/local/go/bin:/usr/local/bin:${env.PATH}"
     }
 
     options {
