@@ -1,5 +1,48 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml '''
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: jenkins-agent
+spec:
+  containers:
+  - name: jnlp
+    image: jenkins/inbound-agent:latest
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: docker-sock
+    - mountPath: /usr/bin/docker
+      name: docker-bin
+    - mountPath: /usr/local/go
+      name: go-home
+    - mountPath: /usr/bin/kubectl
+      name: kubectl-bin
+    - mountPath: /usr/local/bin/k3d
+      name: k3d-bin
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+  - name: docker-bin
+    hostPath:
+      path: /usr/bin/docker
+  - name: go-home
+    hostPath:
+      path: /usr/local/go
+  - name: kubectl-bin
+    hostPath:
+      path: /usr/bin/kubectl
+  - name: k3d-bin
+    hostPath:
+      path: /usr/local/bin/k3d
+'''
+        }
+    }
 
     environment {
         APP_NAME         = 'broadcaster-server'
@@ -7,6 +50,7 @@ pipeline {
         K3D_CLUSTER_NAME = 'sreLab'
         NAMESPACE        = 'broadcaster-dev'
         MANIFESTS_DIR    = 'apps/broadcaster'
+        PATH             = "/usr/local/go/bin:${env.PATH}"
     }
 
     options {
