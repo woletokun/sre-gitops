@@ -21,8 +21,8 @@ spec:
       name: docker-bin
     - mountPath: /usr/local/go
       name: go-home
-    - mountPath: /usr/local/bin
-      name: local-bin
+    - mountPath: /host-bin
+      name: host-bin
   volumes:
   - name: docker-sock
     hostPath:
@@ -33,7 +33,7 @@ spec:
   - name: go-home
     hostPath:
       path: /usr/local/go
-  - name: local-bin
+  - name: host-bin
     hostPath:
       path: /usr/local/bin
 '''
@@ -46,7 +46,7 @@ spec:
         K3D_CLUSTER_NAME = 'sreLab'
         NAMESPACE        = 'broadcaster-dev'
         MANIFESTS_DIR    = 'apps/broadcaster'
-        PATH             = "/usr/local/go/bin:/usr/local/bin:${env.PATH}"
+        PATH             = "/usr/local/go/bin:/host-bin:${env.PATH}"
     }
 
     options {
