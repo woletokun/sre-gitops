@@ -14,6 +14,9 @@ spec:
     securityContext:
       privileged: true
       runAsUser: 0
+    env:
+    - name: PATH
+      value: /usr/local/go/bin:/host-bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     volumeMounts:
     - mountPath: /var/run/docker.sock
       name: docker-sock
@@ -46,7 +49,6 @@ spec:
         K3D_CLUSTER_NAME = 'sreLab'
         NAMESPACE        = 'broadcaster-dev'
         MANIFESTS_DIR    = 'apps/broadcaster'
-        PATH             = "/usr/local/go/bin:/host-bin:${env.PATH}"
         GOCACHE          = "${WORKSPACE}/.cache/go-build"
         GOPATH           = "${WORKSPACE}/.go"
     }
